@@ -16,7 +16,7 @@ public class Lexer {
 
 	String[] words = new String[] { "boolean", "class", "else", "extends",
 			"false", "if", "int", "length", "main", "new", "out", "println",
-			"public", "return", "static", "String", "Sysyem", "this", "true",
+			"public", "return", "static", "String", "System", "this", "true",
 			"void", "while" };
 	Kind[] kinds = new Kind[] { Kind.TOKEN_BOOLEAN, Kind.TOKEN_CLASS,
 			Kind.TOKEN_ELSE, Kind.TOKEN_EXTENDS, Kind.TOKEN_FALSE,
@@ -27,7 +27,8 @@ public class Lexer {
 			Kind.TOKEN_TRUE, Kind.TOKEN_VOID, Kind.TOKEN_WHILE };
 	int tokenval;
 	int lineno = 1;
-	char lexbuf[];
+	int columnno = 0;
+	String lexbuf = "";
 
 	// When called, return the next token (refer to the code "Token.java")
 	// from the input stream.
@@ -37,86 +38,142 @@ public class Lexer {
 	// line number for the "EOF" token.
 	private Token nextTokenInternal() throws Exception {
 		int c;
+		int cur_column;
 		c = this.fstream.read();
+		columnno++;
 		while (true) {
 			// skip all kinds of "blanks"
-			while (' ' == c || '\t' == c || '\n' == c) {
-				if ('\n' == c) {
+			while (' ' == c || '\t' == c || 13 == c || 10 == c) {
+				if (10 == c) {
 					lineno++;
+					columnno = 0;
+				}
+				if ('\t' == c) {
+					columnno += 7;
 				}
 				c = this.fstream.read();
+				columnno++;
 			}
 			if (-1 == c)
-				return new Token(Kind.TOKEN_EOF, null);
+				return new Token(Kind.TOKEN_EOF, lineno, columnno);
 			if (isdigit(c)) {
+				columnno++;
+				cur_column = columnno;
 				tokenval = c - '0';
+				this.fstream.mark(1);
 				c = this.fstream.read();
 				while (isdigit(c)) {
+					columnno++;
 					tokenval = tokenval * 10 + c - '0';
+					this.fstream.mark(1);
 					c = this.fstream.read();
 				}
-				return new Token(Kind.TOKEN_NUM, lineno,
+				if (isalpha(c)) {
+					new Todo();
+					return null;
+				}
+				this.fstream.reset();
+				columnno--;
+				return new Token(Kind.TOKEN_NUM, lineno, cur_column,
 						Integer.toString(tokenval));
 			}
 			if (isalpha(c)) {
-				int b = 0;
+				cur_column = columnno;
+				lexbuf = "";
 				while (isalpha(c) || isdigit(c)) {
-					lexbuf[b] = (char) c;
+					columnno++;
+					lexbuf += String.valueOf((char) c);
+					this.fstream.mark(1);
 					c = this.fstream.read();
-					b++;
 				}
-				if (' ' == c || '\t' == c || '\n' == c) {
-					if ('\n' == c) {
-						lineno++;
-					}
-					lexbuf[b] = '\0';
-					int p = lookup(String.valueOf(lexbuf));
-					if (-1 != p) {
-						return new Token(kinds[p], lineno - 1);
-					} else {
-						return new Token(Kind.TOKEN_ID, lineno - 1);
-					}
+				this.fstream.reset();
+				columnno--;
+				int p = lookup(lexbuf);
+				if (-1 != p) {
+					return new Token(kinds[p], lineno, cur_column);
 				} else {
-					new Todo();
-					return null;
+					return new Token(Kind.TOKEN_ID, lineno, cur_column);
 				}
 			}
 			switch (c) {
 			case '+':
-				return new Token(Kind.TOKEN_ADD, lineno);
+				return new Token(Kind.TOKEN_ADD, lineno, columnno);
 			case '&':
 				if (this.fstream.read() == '&') {
-					return new Token(Kind.TOKEN_AND, lineno);
+					return new Token(Kind.TOKEN_AND, lineno, ++columnno);
 				}
 			case '=':
-				return new Token(Kind.TOKEN_ASSIGN, lineno);
+				return new Token(Kind.TOKEN_ASSIGN, lineno, columnno);
 			case ',':
-				return new Token(Kind.TOKEN_COMMER, lineno);
+				return new Token(Kind.TOKEN_COMMER, lineno, columnno);
 			case '.':
-				return new Token(Kind.TOKEN_DOT, lineno);
+				return new Token(Kind.TOKEN_DOT, lineno, columnno);
 			case '{':
-				return new Token(Kind.TOKEN_LBRACE, lineno);
+				return new Token(Kind.TOKEN_LBRACE, lineno, columnno);
 			case '[':
-				return new Token(Kind.TOKEN_LBRACK, lineno);
+				return new Token(Kind.TOKEN_LBRACK, lineno, columnno);
 			case '(':
-				return new Token(Kind.TOKEN_LPAREN, lineno);
+				return new Token(Kind.TOKEN_LPAREN, lineno, columnno);
 			case '<':
-				return new Token(Kind.TOKEN_LT, lineno);
+				return new Token(Kind.TOKEN_LT, lineno, columnno);
 			case '!':
-				return new Token(Kind.TOKEN_NOT, lineno);
+				return new Token(Kind.TOKEN_NOT, lineno, columnno);
 			case '}':
-				return new Token(Kind.TOKEN_RBRACE, lineno);
+				return new Token(Kind.TOKEN_RBRACE, lineno, columnno);
 			case ']':
-				return new Token(Kind.TOKEN_RBRACK, lineno);
+				return new Token(Kind.TOKEN_RBRACK, lineno, columnno);
 			case ')':
-				return new Token(Kind.TOKEN_RPAREN, lineno);
+				return new Token(Kind.TOKEN_RPAREN, lineno, columnno);
 			case ';':
-				return new Token(Kind.TOKEN_SEMI, lineno);
+				return new Token(Kind.TOKEN_SEMI, lineno, columnno);
 			case '-':
-				return new Token(Kind.TOKEN_SUB, lineno);
+				return new Token(Kind.TOKEN_SUB, lineno, columnno);
 			case '*':
-				return new Token(Kind.TOKEN_TIMES, lineno);
+				return new Token(Kind.TOKEN_TIMES, lineno, columnno);
+			case '/':
+				int cc = this.fstream.read();
+				if ('/' == cc) {
+					cc = this.fstream.read();
+					while (cc != 10 && cc != -1) {
+						cc = this.fstream.read();
+					}
+					if (cc == 10) {
+						lineno++;
+						columnno = 0;
+					}
+					c = this.fstream.read();
+					columnno++;
+					continue;
+				} else if (cc == '*') {
+					cc = this.fstream.read();
+					int circle = 1;
+					while (circle != 0) {
+						while (cc != '*' && cc != '/') {
+							cc = this.fstream.read();
+							if (cc == 10) {
+								lineno++;
+								columnno = 0;
+							}
+						}
+						if (cc == '/' && this.fstream.read() == '*') {
+							circle++;
+							cc = this.fstream.read();
+						}
+						if (cc == '*' && this.fstream.read() == '/') {
+							circle--;
+							cc = this.fstream.read();
+						}
+					}
+					c = this.fstream.read();
+					columnno++;
+					continue;
+				} else {
+					new Todo();
+					return null;
+				}
+
 			default:
+				/* /////*gfghgfg*/
 				// Lab 1, exercise 2: supply missing code to
 				// lex other kinds of tokens.
 				// Hint: think carefully about the basic
