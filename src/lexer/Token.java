@@ -1,5 +1,7 @@
 package lexer;
 
+import util.Todo.ErrorKind;
+
 public class Token {
 	// Lab 1, exercise 1: read the MiniJava specification
 	// carefully, and answer these two questions:
@@ -81,7 +83,7 @@ public class Token {
 
 		// to check that the "lineNum" field has been properly set.
 		if (this.lineNum == null)
-			new util.Todo();
+			new util.Todo(ErrorKind.ÐÐºÅÎª¿Õ, this.lineNum, this.columnNum);
 
 		s = ": " + ((this.lexeme == null) ? "<NONE>" : this.lexeme)
 				+ " : at line " + this.lineNum.toString() + ", column "

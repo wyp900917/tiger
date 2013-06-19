@@ -4,6 +4,7 @@ import java.io.InputStream;
 
 import lexer.Token.Kind;
 import util.Todo;
+import util.Todo.ErrorKind;
 
 public class Lexer {
 	String fname; // the input file name to be compiled
@@ -44,7 +45,7 @@ public class Lexer {
 		while (true) {
 			// skip all kinds of "blanks"
 			while (' ' == c || '\t' == c || 13 == c || 10 == c) {
-				if (10 == c) {
+				if (10 == c) {//换行字符ASICC码=10
 					lineno++;
 					columnno = 0;
 				}
@@ -52,15 +53,15 @@ public class Lexer {
 					columnno += 7;
 				}
 				c = this.fstream.read();
-				columnno++;
+				columnno++;//每次读一个字符，列号加1
 			}
-			if (-1 == c)
+			if (-1 == c)//文件结束标志
 				return new Token(Kind.TOKEN_EOF, lineno, columnno);
-			if (isdigit(c)) {
+			if (isdigit(c)) {//判断当前字符是否为数字字符
 				columnno++;
 				cur_column = columnno;
 				tokenval = c - '0';
-				this.fstream.mark(1);
+				this.fstream.mark(1);//标记当前读取的字符数为1
 				c = this.fstream.read();
 				while (isdigit(c)) {
 					columnno++;
@@ -68,16 +69,16 @@ public class Lexer {
 					this.fstream.mark(1);
 					c = this.fstream.read();
 				}
-				if (isalpha(c)) {
-					new Todo();
+				if (isalpha(c)) {//判断当前字符是否为字母
+					new Todo(ErrorKind.非法标识符, lineno, columnno);
 					return null;
 				}
-				this.fstream.reset();
+				this.fstream.reset();//将文件指针返回到上一次标记处
 				columnno--;
 				return new Token(Kind.TOKEN_NUM, lineno, cur_column,
 						Integer.toString(tokenval));
 			}
-			if (isalpha(c)) {
+			if (isalpha(c)) {//判断当前字符是否为字母
 				cur_column = columnno;
 				lexbuf = "";
 				while (isalpha(c) || isdigit(c)) {
@@ -145,35 +146,36 @@ public class Lexer {
 					columnno++;
 					continue;
 				} else if (cc == '*') {
-					cc = this.fstream.read();
 					int circle = 1;
-					while (circle != 0) {
-						while (cc != '*' && cc != '/') {
+					cc = this.fstream.read();
+					while (0 != circle) {
+						while (cc != '*') {
 							cc = this.fstream.read();
+							columnno++;
 							if (cc == 10) {
 								lineno++;
 								columnno = 0;
 							}
+							if ('\t' == c) {
+								columnno += 7;
+							}
 						}
-						if (cc == '/' && this.fstream.read() == '*') {
-							circle++;
-							cc = this.fstream.read();
-						}
-						if (cc == '*' && this.fstream.read() == '/') {
+						cc = this.fstream.read();
+						columnno++;
+						if (cc == '/') {
+							c = this.fstream.read();
+							columnno++;
 							circle--;
-							cc = this.fstream.read();
 						}
 					}
-					c = this.fstream.read();
-					columnno++;
 					continue;
 				} else {
-					new Todo();
+					new Todo(ErrorKind.非法标识符, lineno, columnno);
 					return null;
 				}
 
 			default:
-				/* /////*gfghgfg*/
+				/* /////*gfghgfg */
 				// Lab 1, exercise 2: supply missing code to
 				// lex other kinds of tokens.
 				// Hint: think carefully about the basic
@@ -181,7 +183,7 @@ public class Lexer {
 				// is not that much and may be less than 50 lines. If you
 				// find you are writing a lot of code, you
 				// are on the wrong way.
-				new Todo();
+				new Todo(ErrorKind.非法字符, lineno, columnno);
 				return null;
 			}
 		}

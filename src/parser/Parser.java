@@ -25,14 +25,18 @@ public class Parser {
 		if (kind == current.kind)
 			advance();
 		else {
-			System.out.println("Expects: " + kind.toString());
-			System.out.println("But got: " + current.kind.toString());
+			System.out.print("at line " + current.lineNum + ",column "
+					+ current.columnNum + '\t');
+			System.out.print("Expects: " + kind.toString());
+			System.out.println(",But got: " + current.kind.toString());
 			System.exit(1);
 		}
 	}
 
-	private void error() {
+	private void error(Token current) {
 		System.out.println("Syntax error: compilation aborting...\n");
+		System.out.println("Error Information:" + current.kind.toString() + "\tat line "
+				+ current.lineNum + ",column " + current.columnNum);
 		System.exit(1);
 		return;
 	}
@@ -99,12 +103,12 @@ public class Parser {
 				eatToken(Kind.TOKEN_RPAREN);
 				return;
 			default:
-				error();
+				error(current);
 				return;
 			}
 		}
 		default:
-			error();
+			error(current);
 			return;
 		}
 	}
@@ -243,7 +247,7 @@ public class Parser {
 		}
 		case TOKEN_ID: {
 			advance();
-			switch(current.kind) {
+			switch (current.kind) {
 			case TOKEN_ASSIGN: {
 				advance();
 				parseExp();
@@ -262,7 +266,8 @@ public class Parser {
 			}
 		}
 		default:
-			new util.Todo();
+			error(current);
+			return;
 		}
 		// Lab1. Exercise 4: Fill in the missing code
 		// to parse a statement.
@@ -304,7 +309,8 @@ public class Parser {
 			return;
 		}
 		default:
-			new util.Todo();
+			error(current);
+			return;
 		}
 		// Lab1. Exercise 4: Fill in the missing code
 		// to parse a type.
@@ -366,20 +372,19 @@ public class Parser {
 			parseVarDecl();
 		}
 		parseStatements();
-		/*while (current.kind == Kind.TOKEN_LBRACE
-				|| current.kind == Kind.TOKEN_IF
-				|| current.kind == Kind.TOKEN_WHILE
-				|| current.kind == Kind.TOKEN_SYSTEM
-				|| current.kind == Kind.TOKEN_ID) {
-			parseStatement();
-		}*/
+		/*
+		 * while (current.kind == Kind.TOKEN_LBRACE || current.kind ==
+		 * Kind.TOKEN_IF || current.kind == Kind.TOKEN_WHILE || current.kind ==
+		 * Kind.TOKEN_SYSTEM || current.kind == Kind.TOKEN_ID) {
+		 * parseStatement(); }
+		 */
 		eatToken(Kind.TOKEN_RETURN);
 		parseExp();
 		eatToken(Kind.TOKEN_SEMI);
 		eatToken(Kind.TOKEN_RBRACE);
 		// Lab1. Exercise 4: Fill in the missing code
 		// to parse a method.
-		//new util.Todo();
+		// new util.Todo();
 		return;
 	}
 
@@ -445,7 +450,7 @@ public class Parser {
 		parseStatement();
 		eatToken(Kind.TOKEN_RBRACE);
 		eatToken(Kind.TOKEN_RBRACE);
-		//new util.Todo();
+		// new util.Todo();
 	}
 
 	// Program -> MainClass ClassDecl*
