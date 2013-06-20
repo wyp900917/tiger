@@ -35,8 +35,9 @@ public class Parser {
 
 	private void error(Token current) {
 		System.out.println("Syntax error: compilation aborting...\n");
-		System.out.println("Error Information:" + current.kind.toString() + "\tat line "
-				+ current.lineNum + ",column " + current.columnNum);
+		System.out.println("Error Information:" + current.kind.toString()
+				+ "\tat line " + current.lineNum + ",column "
+				+ current.columnNum);
 		System.exit(1);
 		return;
 	}
@@ -79,6 +80,7 @@ public class Parser {
 		case TOKEN_NUM:
 			advance();
 			return;
+		case TOKEN_FALSE:
 		case TOKEN_TRUE:
 			advance();
 			return;
@@ -296,6 +298,7 @@ public class Parser {
 		case TOKEN_INT: {
 			advance();
 			if (current.kind == Kind.TOKEN_LBRACK) {
+				eatToken(Kind.TOKEN_LBRACK);
 				eatToken(Kind.TOKEN_RBRACK);
 			}
 			return;
@@ -359,7 +362,7 @@ public class Parser {
 	// Method -> public Type id ( FormalList )
 	// { VarDecl* Statement* return Exp ;}
 	private void parseMethod() {
-		advance();
+		eatToken(Kind.TOKEN_PUBLIC);
 		parseType();
 		eatToken(Kind.TOKEN_ID);
 		eatToken(Kind.TOKEN_LPAREN);
@@ -369,15 +372,35 @@ public class Parser {
 		while (current.kind == Kind.TOKEN_INT
 				|| current.kind == Kind.TOKEN_BOOLEAN
 				|| current.kind == Kind.TOKEN_ID) {
-			parseVarDecl();
+			if (current.kind != Kind.TOKEN_ID) {
+				parseVarDecl();
+			} else {
+				advance();
+				if (current.kind == Kind.TOKEN_ID) {
+					eatToken(Kind.TOKEN_ID);
+					eatToken(Kind.TOKEN_SEMI);
+				} else {
+					if (current.kind == Kind.TOKEN_ASSIGN) {
+						advance();
+						parseExp();
+						eatToken(Kind.TOKEN_SEMI);
+						break;
+					} else if (current.kind == Kind.TOKEN_LBRACK) {
+						advance();
+						parseExp();
+						eatToken(Kind.TOKEN_RBRACK);
+						eatToken(Kind.TOKEN_ASSIGN);
+						parseExp();
+						eatToken(Kind.TOKEN_SEMI);
+						break;
+					} else {
+						error(current);
+						return;
+					}
+				}
+			}
 		}
 		parseStatements();
-		/*
-		 * while (current.kind == Kind.TOKEN_LBRACE || current.kind ==
-		 * Kind.TOKEN_IF || current.kind == Kind.TOKEN_WHILE || current.kind ==
-		 * Kind.TOKEN_SYSTEM || current.kind == Kind.TOKEN_ID) {
-		 * parseStatement(); }
-		 */
 		eatToken(Kind.TOKEN_RETURN);
 		parseExp();
 		eatToken(Kind.TOKEN_SEMI);
