@@ -83,8 +83,13 @@ public class Token
     if (this.lineNum == null)
       new util.Todo();
 
-    s = ": " + ((this.lexeme == null) ? "<NONE>" : this.lexeme) + " : at line "
-        + this.lineNum.toString();
-    return this.kind.toString() + s;
-  }
+		// to check that the "lineNum" field has been properly set.
+		if (this.lineNum == null)
+			new util.Todo(ErrorKind.ÐÐºÅÎª¿Õ, this.lineNum, this.columnNum);
+
+		s = ": " + ((this.lexeme == null) ? "<NONE>" : this.lexeme)
+				+ " : at line " + this.lineNum.toString() + ", column "
+				+ this.columnNum.toString();
+		return this.kind.toString() + s;
+	}
 }

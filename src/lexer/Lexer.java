@@ -29,12 +29,19 @@ public class Lexer
       // line number for the "EOF" token.
       return new Token(Kind.TOKEN_EOF, null);
 
-    // skip all kinds of "blanks"
-    while (' ' == c || '\t' == c || '\n' == c) {
-      c = this.fstream.read();
-    }
-    if (-1 == c)
-      return new Token(Kind.TOKEN_EOF, null);
+			default:
+				/* /////*gfghgfg */
+				// Lab 1, exercise 2: supply missing code to
+				// lex other kinds of tokens.
+				// Hint: think carefully about the basic
+				// data structure and algorithms. The code
+				// is not that much and may be less than 50 lines. If you
+				// find you are writing a lot of code, you
+				// are on the wrong way.
+				new Todo(ErrorKind.·Ç·¨×Ö·û, lineno, columnno);
+				return null;
+			}
+		}
 
     switch (c) {
     case '+':
@@ -56,14 +63,31 @@ public class Lexer
   {
     Token t = null;
 
-    try {
-      t = this.nextTokenInternal();
-    } catch (Exception e) {
-      e.printStackTrace();
-      System.exit(1);
-    }
-    if (control.Control.lex)
-      System.out.println(t.toString());
-    return t;
-  }
+	public boolean isalpha(int c) {
+		return c - 'a' >= 0 && c - 'z' <= 0 || c - 'A' >= 0 && c - 'Z' <= 0
+				|| c == '_' ? true : false;
+	}
+
+	public int lookup(String lexbuf) {
+		for (int i = 0; i < words.length; i++) {
+			if (words[i].equals(lexbuf)) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	public Token nextToken() {
+		Token t = null;
+
+		try {
+			t = this.nextTokenInternal();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		if (control.Control.lex)
+			System.out.println(t.toString());
+		return t;
+	}
 }
