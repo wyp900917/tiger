@@ -43,7 +43,7 @@ public class MethodTable
 
   public void dump()
   {
-    new Todo();
+    //new Todo();
   }
 
   @Override
