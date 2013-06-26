@@ -93,7 +93,7 @@ public class Lexer {
 				if (-1 != p) {
 					return new Token(kinds[p], lineno, cur_column);
 				} else {
-					return new Token(Kind.TOKEN_ID, lineno, cur_column);
+					return new Token(Kind.TOKEN_ID, lineno, cur_column,lexbuf);
 				}
 			}
 			switch (c) {

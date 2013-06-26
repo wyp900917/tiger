@@ -18,9 +18,11 @@ public class Fac {
 
 	// // main class: "Factorial"
 	static ast.mainClass.MainClass factorial = new ast.mainClass.MainClass(
-			"Factorial", "a", new ast.stm.Print(new ast.exp.Call(
-					new ast.exp.NewObject("Fac"), "ComputeFac",
-					new util.Flist<ast.exp.T>().addAll(new ast.exp.Num(10)))));
+			"Factorial", "a",
+			new util.Flist<ast.stm.T>().addAll(new ast.stm.Print(
+					new ast.exp.Call(new ast.exp.NewObject("Fac"),
+							"ComputeFac", new util.Flist<ast.exp.T>()
+									.addAll(new ast.exp.Num(10))))));
 
 	// // class "Fac"
 	static ast.classs.Class fac = new ast.classs.Class(
@@ -77,9 +79,10 @@ public class Fac {
 	 * while (i<n) sum = sum + i; return sum; } }
 	 */
 	static ast.mainClass.MainClass sum = new ast.mainClass.MainClass("Sum",
-			"a", new ast.stm.Print(new ast.exp.Call(new ast.exp.NewObject(
-					"Doit"), "doit",
-					new util.Flist<ast.exp.T>().addAll(new ast.exp.Num(101)))));
+			"a", new util.Flist<ast.stm.T>().addAll(new ast.stm.Print(
+					new ast.exp.Call(new ast.exp.NewObject("Doit"), "doit",
+							new util.Flist<ast.exp.T>().addAll(new ast.exp.Num(
+									101))))));
 
 	static ast.classs.Class doit = new ast.classs.Class("Doit", null,
 			new util.Flist<ast.dec.T>().addAll(),
@@ -99,6 +102,6 @@ public class Fac {
 					new ast.exp.Id("sum"))));
 
 	// program
-	public static ast.program.Program sum_prog = new ast.program.Program(
-			sum, new util.Flist<ast.classs.T>().addAll(doit));
+	public static ast.program.Program sum_prog = new ast.program.Program(sum,
+			new util.Flist<ast.classs.T>().addAll(doit));
 }
