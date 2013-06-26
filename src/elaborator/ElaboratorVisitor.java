@@ -20,9 +20,9 @@ public class ElaboratorVisitor implements ast.Visitor {
 	private void error(ast.type.T t1, ast.type.T t2, String info) {
 		System.out.println("type mismatch:");
 		if (t1 == null && t2 == null) {
-			System.out.println(info);
+			System.out.println("\t"+info);
 		} else
-			System.out.print("\t\t\tInformation:" + t1.toString()
+			System.out.println("\tInformation:" + t1.toString()
 					+ " not match " + t2.toString());
 		return;
 		// System.exit(1);

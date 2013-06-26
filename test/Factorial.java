@@ -15,8 +15,6 @@ class Fac {
             num_aux = 1;
         else
             num_aux = num * (this.ComputeFac(num-1));
-        while (i<n)
-        	sum = sum + i;
         return num_aux;
     }
 }
