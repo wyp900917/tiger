@@ -2,18 +2,20 @@ package elaborator;
 
 import java.util.Hashtable;
 
+import util.Id_name;
+
 public class ElaboratorVisitor implements ast.Visitor {
 	public ClassTable classTable; // symbol table for class
 	public Hashtable<String,MethodTable> methodTable; // symbol table for each method
 	public String currentClass; // the class name being elaborated
-	public String currentMethod;
+	public Id_name currentId;
 	public ast.type.T type; // type of the expression being elaborated
 
 	public ElaboratorVisitor() {
 		this.classTable = new ClassTable();
 		this.methodTable = new Hashtable<String,MethodTable>();
 		this.currentClass = null;
-		this.currentMethod = null;
+		this.currentId = null;
 		this.type = null;
 	}
 
@@ -104,7 +106,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 	@Override
 	public void visit(ast.exp.Id e) {
 		// first look up the id in method table
-		ast.type.T type = this.methodTable.get(this.currentMethod).get(e.id);
+		ast.type.T type = this.methodTable.get(this.currentId).get(e.id);
 		// if search failed, then s.id must be a class field.
 		if (type == null) {
 			type = this.classTable.get(this.currentClass, e.id);
@@ -114,6 +116,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 		}
 		if (type == null)
 			error(null, null, e.id + ":该标识符未定义！");
+		this.currentId.setValue(1);//访问过
 		this.type = type;
 		// record this type on this node for future use.
 		e.type = type;
@@ -201,7 +204,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 	@Override
 	public void visit(ast.stm.Assign s) {
 		// first look up the id in method table
-		ast.type.T type = this.methodTable.get(this.currentMethod).get(s.id);
+		ast.type.T type = this.methodTable.get(this.currentId).get(s.id);
 		// if search failed, then s.id must
 		if (type == null)
 			type = this.classTable.get(this.currentClass, s.id);
@@ -216,7 +219,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.stm.AssignArray s) {
-		ast.type.T type = this.methodTable.get(this.currentMethod).get(s.id);
+		ast.type.T type = this.methodTable.get(this.currentId).get(s.id);
 		if (type == null)
 			type = this.classTable.get(this.currentClass, s.id);
 		if (type == null)
@@ -308,7 +311,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 			this.methodTable.get(m.id).dump();
 		}
 		for (ast.stm.T s : m.stms) {
-			this.currentMethod = m.id;
+			this.currentId = new Id_name(m.id,0);
 			s.accept(this);
 		}
 		
