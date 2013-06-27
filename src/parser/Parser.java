@@ -7,7 +7,7 @@ import lexer.Token.Kind;
 
 public class Parser {
 	Lexer lexer;
-	Token current;
+	public static Token current;
 
 	public Parser(String fname, java.io.InputStream fstream) {
 		lexer = new Lexer(fname, fstream);
@@ -140,7 +140,7 @@ public class Parser {
 				advance();
 				if (current.kind == Kind.TOKEN_LENGTH) {
 					advance();
-					return new ast.exp.Call(exp, "length", null);
+					return new ast.exp.Length(exp);
 				}
 				String id = eatToken(Kind.TOKEN_ID);
 				eatToken(Kind.TOKEN_LPAREN);
@@ -270,8 +270,9 @@ public class Parser {
 			eatToken(Kind.TOKEN_LPAREN);
 			ast.exp.T exp = parseExp();
 			eatToken(Kind.TOKEN_RPAREN);
+			ast.stm.Print print = new ast.stm.Print(exp);
 			eatToken(Kind.TOKEN_SEMI);
-			return new ast.stm.Print(exp);
+			return print;
 		}
 		case TOKEN_ID: {
 			String id = current.lexeme;
@@ -280,8 +281,9 @@ public class Parser {
 			case TOKEN_ASSIGN: {
 				advance();
 				ast.exp.T exp = parseExp();
+				ast.stm.Assign assign = new ast.stm.Assign(id, exp);
 				eatToken(Kind.TOKEN_SEMI);
-				return new ast.stm.Assign(id, exp);
+				return assign;
 			}
 			case TOKEN_LBRACK: {
 				advance();
@@ -289,8 +291,9 @@ public class Parser {
 				eatToken(Kind.TOKEN_RBRACK);
 				eatToken(Kind.TOKEN_ASSIGN);
 				ast.exp.T exp = parseExp();
+				ast.stm.AssignArray assignarray = new ast.stm.AssignArray(id, index, exp);
 				eatToken(Kind.TOKEN_SEMI);
-				return new ast.stm.AssignArray(id, index, exp);
+				return assignarray;
 			}
 			}
 		}
@@ -338,8 +341,9 @@ public class Parser {
 			return new ast.type.Boolean();
 		}
 		case TOKEN_ID: {
+			String id = current.lexeme;
 			advance();
-			return new ast.type.Int();
+			return new ast.type.Class(id);
 		}
 		default:
 			error(current);
@@ -356,8 +360,9 @@ public class Parser {
 		// a fresh one.
 		ast.type.T type = parseType();
 		String id = eatToken(Kind.TOKEN_ID);
+		ast.dec.Dec dec = new ast.dec.Dec(type, id);
 		eatToken(Kind.TOKEN_SEMI);
-		return new ast.dec.Dec(type, id);
+		return dec;
 	}
 
 	// VarDecls -> VarDecl VarDecls
