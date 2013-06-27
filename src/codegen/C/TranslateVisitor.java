@@ -297,7 +297,7 @@ public class TranslateVisitor implements ast.Visitor
 
     this.tmpVars = new java.util.LinkedList<codegen.C.dec.T>();
 
-    c.stm.accept(this);
+    //c.stm.accept(this);
     codegen.C.mainMethod.T mthd = new codegen.C.mainMethod.MainMethod(
         this.tmpVars, this.stm);
     this.mainMethod = mthd;

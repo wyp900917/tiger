@@ -1,6 +1,6 @@
 package elaborator;
 
-import util.Todo;
+import java.util.Iterator;
 
 public class ClassTable
 {
@@ -81,7 +81,27 @@ public class ClassTable
 
   public void dump()
   {
-    new Todo();
+	  for (Iterator<String> cls_table = this.table.keySet().iterator(); cls_table.hasNext();) {
+			String cls_id = (String) cls_table.next();
+			ClassBinding cls_bind = this.table.get(cls_id);
+			System.out.println("Class:"+cls_id);
+			System.out.println("\tfields: ");
+			for(Iterator<?> fields = cls_bind.fields.keySet().iterator(); fields.hasNext();) {
+				String key = (String) fields.next();
+				ast.type.T type = cls_bind.fields.get(key);
+				System.out.println("\t\t"+type + "  " + key);
+			}
+			System.out.println("");
+			System.out.println("\tmethods: ");
+			for(Iterator<?> methods = cls_bind.methods.keySet().iterator(); methods.hasNext();) {
+				String key = (String) methods.next();
+				MethodType type = cls_bind.methods.get(key);
+				System.out.println("\t\t"+key + "():  " + type);
+			}
+			System.out.println("");
+		}
+	  System.out.println("");
+    //new Todo();
   }
 
   @Override

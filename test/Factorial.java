@@ -1,11 +1,16 @@
-class Factorial { 
+class Factorial {
 	public static void main(String[] a) {
-        System.out.println(new Fac().ComputeFac(10));
-    }
+		System.out.println(new Fac().ComputeFac(10));
+	}
 }
+
 class Fac {
-    public int ComputeFac(int num) {
+	public int ComputeFac(int num) {
         int num_aux;
+        int sum;
+        int i;    
+        i = 0;
+        sum = 0;
         if (num < 1)
             num_aux = 1;
         else

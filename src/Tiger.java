@@ -47,6 +47,7 @@ public class Tiger
       codegen.C.PrettyPrintVisitor ppc = new codegen.C.PrettyPrintVisitor();
       cast.accept(ppc);
 
+      ast.Fac.sum_prog.accept(pp);
       System.out.println("Testing the Tiger compiler on Fac.java finished.");
       System.exit(1);
     }

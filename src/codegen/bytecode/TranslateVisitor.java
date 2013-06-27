@@ -317,7 +317,7 @@ public class TranslateVisitor implements ast.Visitor
   @Override
   public void visit(ast.mainClass.MainClass c)
   {
-    c.stm.accept(this);
+    //c.stm.accept(this);
     this.mainClass = new codegen.bytecode.mainClass.MainClass(c.id, c.arg,
         this.stms);
     this.stms = new java.util.LinkedList<codegen.bytecode.stm.T>();
