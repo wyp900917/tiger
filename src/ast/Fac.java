@@ -65,7 +65,6 @@ public class Fac {
 	// program
 	public static ast.program.Program prog = new ast.program.Program(factorial,
 			new util.Flist<ast.classs.T>().addAll(fac));
-
 	// Lab2, exercise 2: you should write some code to
 	// represent the program "test/Sum.java".
 	// Your code here:

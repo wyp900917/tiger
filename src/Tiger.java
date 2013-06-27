@@ -48,6 +48,8 @@ public class Tiger
       cast.accept(ppc);
 
       ast.Fac.sum_prog.accept(pp);
+      ast.Fac.prog.accept(pp);
+      ast.Fac.sum_prog.accept(pp);
       System.out.println("Testing the Tiger compiler on Fac.java finished.");
       System.exit(1);
     }
@@ -106,7 +108,7 @@ public class Tiger
     theAst.accept(elab);
 
     // code generation
-    switch (control.Control.codegen) {
+    /*switch (control.Control.codegen) {
     case Bytecode:
       codegen.bytecode.TranslateVisitor trans = new codegen.bytecode.TranslateVisitor();
       theAst.accept(trans);
@@ -126,7 +128,7 @@ public class Tiger
       break;
     default:
       break;
-    }
+    }*/
     
     // Lab3, exercise 6: add some glue code to
     // call gcc to compile the generated C or x86
