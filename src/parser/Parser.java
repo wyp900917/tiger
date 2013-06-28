@@ -9,6 +9,11 @@ public class Parser {
 	Lexer lexer;
 	public static Token current;
 
+	public Parser() {
+		lexer = null;
+		current = new Token(Kind.TOKEN_ADD, 1);
+	}
+
 	public Parser(String fname, java.io.InputStream fstream) {
 		lexer = new Lexer(fname, fstream);
 		current = lexer.nextToken();
@@ -160,7 +165,7 @@ public class Parser {
 	// TimesExp -> ! TimesExp
 	// -> NotExp
 	private ast.exp.T parseTimesExp() {
-		//ast.exp.T not_exp = parseNotExp();
+		// ast.exp.T not_exp = parseNotExp();
 		ast.exp.T times_exp;
 		if (current.kind != Kind.TOKEN_NOT) {
 			return parseNotExp();
@@ -291,7 +296,8 @@ public class Parser {
 				eatToken(Kind.TOKEN_RBRACK);
 				eatToken(Kind.TOKEN_ASSIGN);
 				ast.exp.T exp = parseExp();
-				ast.stm.AssignArray assignarray = new ast.stm.AssignArray(id, index, exp);
+				ast.stm.AssignArray assignarray = new ast.stm.AssignArray(id,
+						index, exp);
 				eatToken(Kind.TOKEN_SEMI);
 				return assignarray;
 			}
