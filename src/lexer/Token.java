@@ -66,6 +66,12 @@ public class Token {
 
 	// Some tokens don't come with lexeme but
 	// others do.
+
+	public Token(Kind kind, Integer lineNum) {
+		this.kind = kind;
+		this.lineNum = lineNum;
+	}
+
 	public Token(Kind kind, Integer lineNum, Integer columnNum) {
 		this.kind = kind;
 		this.lineNum = lineNum;
