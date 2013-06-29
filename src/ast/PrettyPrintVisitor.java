@@ -175,13 +175,13 @@ public class PrettyPrintVisitor implements Visitor {
 		s.index.accept(this);
 		this.say("] = ");
 		s.exp.accept(this);
-		this.say(";");
 		this.sayln(";");
 		return;
 	}
 
 	@Override
 	public void visit(ast.stm.Block s) {
+		this.unIndent();
 		this.printSpaces();
 		this.sayln("{");
 		for (ast.stm.T stm : s.stms)
@@ -227,14 +227,9 @@ public class PrettyPrintVisitor implements Visitor {
 		this.say("while (");
 		s.condition.accept(this);
 		this.sayln(")");
-		this.printSpaces();
-		this.sayln("{");
 		this.indent();
 		s.body.accept(this);
 		this.unIndent();
-		this.printSpaces();
-		this.sayln("}");
-		s.body.accept(this);
 		return;
 	}
 

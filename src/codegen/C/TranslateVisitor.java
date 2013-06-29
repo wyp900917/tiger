@@ -1,5 +1,6 @@
 package codegen.C;
 
+
 // Given a Java ast, translate it into a C ast and outputs it.
 
 public class TranslateVisitor implements ast.Visitor
@@ -21,7 +22,6 @@ public class TranslateVisitor implements ast.Visitor
   public TranslateVisitor()
   {
     this.table = new ClassTable();
-    this.classId = null;
     this.type = null;
     this.dec = null;
     this.stm = null;
@@ -38,7 +38,7 @@ public class TranslateVisitor implements ast.Visitor
   // 
   public String genId()
   {
-    return new util.Temp().toString();
+    return this.classId;
   }
 
   // /////////////////////////////////////////////////////
@@ -246,7 +246,7 @@ public class TranslateVisitor implements ast.Visitor
     codegen.C.type.T newRetType = this.type;
     java.util.LinkedList<codegen.C.dec.T> newFormals = new java.util.LinkedList<codegen.C.dec.T>();
     newFormals.add(new codegen.C.dec.Dec(
-        new codegen.C.type.Class(this.classId), "this"));
+        new codegen.C.type.Class(this.classId), "this"));	//添加this变量，指向本类对象
     for (ast.dec.T d : m.formals) {
       d.accept(this);
       newFormals.add(this.dec);
@@ -296,8 +296,9 @@ public class TranslateVisitor implements ast.Visitor
     this.vtables.add(new codegen.C.vtable.Vtable(c.id, cb.methods));
 
     this.tmpVars = new java.util.LinkedList<codegen.C.dec.T>();
-
-    //c.stm.accept(this);
+    for(ast.stm.T m : c.stms) {
+    	m.accept(this);
+    }
     codegen.C.mainMethod.T mthd = new codegen.C.mainMethod.MainMethod(
         this.tmpVars, this.stm);
     this.mainMethod = mthd;
@@ -382,4 +383,5 @@ public class TranslateVisitor implements ast.Visitor
         this.methods, this.mainMethod);
     return;
   }
+  
 }

@@ -119,7 +119,7 @@ public class Tiger {
 			break;
 		case C:
 			codegen.C.TranslateVisitor transC = new codegen.C.TranslateVisitor();
-			theAst.accept(transC);
+			theAst.accept(transC);	//调用TranslateVisitor.java中的visit(ast.program.Program p)方法
 			codegen.C.program.T cAst = transC.program;
 			codegen.C.PrettyPrintVisitor ppc = new codegen.C.PrettyPrintVisitor();
 			cAst.accept(ppc);

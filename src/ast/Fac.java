@@ -55,11 +55,10 @@ public class Fac {
 																			new ast.exp.Num(
 																					1))))))),
 									new ast.stm.While(new ast.exp.Lt(
-											new ast.exp.Id("no"),
+											new ast.exp.Id("num"),
 											new ast.exp.Num(1)),
-											new ast.stm.AssignArray("num_aux",
-													new ast.exp.Num(2),
-													new ast.exp.True()))),
+											new ast.stm.Assign("num_aux",
+													new ast.exp.Num(2)))),
 					new ast.exp.Id("num_aux"))));
 
 	// program
