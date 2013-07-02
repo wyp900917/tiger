@@ -10,8 +10,10 @@ class Doit {
         int i;    
         i = 0;
         sum = 0;
-        while (i < n)
+        while (i < n) {
         	sum = sum + i;
+        }
+        System.out.println(344534);
         return sum;
     }
 }

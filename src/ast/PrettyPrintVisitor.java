@@ -105,7 +105,6 @@ public class PrettyPrintVisitor implements Visitor {
 	public void visit(ast.exp.NewIntArray e) {
 		this.say("new int[ ");
 		e.exp.accept(this);
-		this.sayln(" ];");
 		this.say(" ]");
 		return;
 		// int[] ii = new int[3];
@@ -184,14 +183,14 @@ public class PrettyPrintVisitor implements Visitor {
 		this.unIndent();
 		this.printSpaces();
 		this.sayln("{");
-		for (ast.stm.T stm : s.stms)
-			stm.accept(this);
 		this.indent();
 		for (ast.stm.T stm : s.stms)
 			stm.accept(this);
 		this.unIndent();
 		this.printSpaces();
 		this.sayln("}");
+		this.indent();
+		return;
 	}
 
 	@Override
@@ -207,7 +206,6 @@ public class PrettyPrintVisitor implements Visitor {
 		this.sayln("else");
 		this.indent();
 		s.elsee.accept(this);
-		this.sayln("");
 		this.unIndent();
 		return;
 	}
@@ -215,7 +213,7 @@ public class PrettyPrintVisitor implements Visitor {
 	@Override
 	public void visit(ast.stm.Print s) {
 		this.printSpaces();
-		this.say("System.out.println (");
+		this.say("System.out.println(");
 		s.exp.accept(this);
 		this.sayln(");");
 		return;

@@ -11,7 +11,7 @@ public class Int extends T
   @Override
   public String toString()
   {
-    return "@int";
+    return "int";
   }
 
   @Override

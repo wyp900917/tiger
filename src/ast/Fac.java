@@ -34,7 +34,7 @@ public class Fac {
 					new util.Flist<ast.dec.T>().addAll(new ast.dec.Dec(
 							new ast.type.Int(), "num")),
 					new util.Flist<ast.dec.T>().addAll(new ast.dec.Dec(
-							new ast.type.Int(), "num_aux")),
+							new ast.type.Int(), "num_aux"),new ast.dec.Dec(new ast.type.IntArray(),"sdd")),
 					new util.Flist<ast.stm.T>()
 							.addAll(new ast.stm.If(
 									new ast.exp.Lt(new ast.exp.Id("num"),
@@ -58,7 +58,7 @@ public class Fac {
 											new ast.exp.Id("num"),
 											new ast.exp.Num(1)),
 											new ast.stm.Assign("num_aux",
-													new ast.exp.Num(2)))),
+													new ast.exp.Num(2))),new ast.stm.Assign("sdd", new ast.exp.NewIntArray(new ast.exp.Num(4)))),
 					new ast.exp.Id("num_aux"))));
 
 	// program
