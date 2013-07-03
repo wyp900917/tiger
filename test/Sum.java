@@ -6,14 +6,13 @@ class Sum {
 class Doit {
     public int doit(int n) {
         int sum;
-        boolean t;
         int i;    
         i = 0;
         sum = 0;
         while (i < n) {
         	sum = sum + i;
+        	i = i + 1;
         }
-        System.out.println(344534);
         return sum;
     }
 }

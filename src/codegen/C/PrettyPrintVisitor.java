@@ -95,7 +95,9 @@ public class PrettyPrintVisitor implements Visitor {
 			}
 			this.say("))");
 		} else {
-			this.say("this->vptr->" + e.id + "(this");
+			e.exp.accept(this);
+			this.say("->vptr->" + e.id + "(");
+			e.exp.accept(this);
 			int size = e.args.size();
 			if (size == 0) {
 				this.say(")");
@@ -225,7 +227,7 @@ public class PrettyPrintVisitor implements Visitor {
 		this.say(" = ");
 		if (s.exp instanceof codegen.C.exp.NewIntArray) {
 			codegen.C.exp.NewIntArray e = (codegen.C.exp.NewIntArray) s.exp;
-			this.sayln("(intArray *)malloc(sizeof(intArray));");
+			this.sayln("(struct intArray *)malloc(sizeof(struct intArray));");
 			this.printSpaces();
 			(new codegen.C.exp.Id(s.id)).accept(this);
 			this.say("->length = ");
@@ -332,7 +334,7 @@ public class PrettyPrintVisitor implements Visitor {
 
 	@Override
 	public void visit(codegen.C.type.IntArray t) {
-		this.say("intArray *");
+		this.say("struct intArray *");
 	}
 
 	// dec
@@ -410,13 +412,14 @@ public class PrettyPrintVisitor implements Visitor {
 			this.say("  ");
 			t.ret.accept(this);
 			this.say("(*" + t.id + ")(");
-			this.say(v.id + " *");
+			this.say("struct " + v.id + " *");
 			for (codegen.C.dec.T d : t.args) {
 				codegen.C.dec.Dec dd = (codegen.C.dec.Dec) d;
 				this.say(", ");
 				this.say(dd.type.toString());
-				if (dd.type instanceof codegen.C.type.Class)
+				if (dd.type instanceof codegen.C.type.Class) {
 					this.say(" *");
+				}
 			}
 			this.sayln(");");
 		}
@@ -497,15 +500,33 @@ public class PrettyPrintVisitor implements Visitor {
 		}
 		this.sayln("");
 
-		this.sayln("// methods");
+		this.sayln("// methods declarations");
 		for (codegen.C.method.T m : p.methods) {
-			m.accept(this);
+			codegen.C.method.Method method = (codegen.C.method.Method) m;
+			method.retType.accept(this);
+			this.say(method.classId + "_" + method.id + "(");
+			int count = method.formals.size();
+			for (codegen.C.dec.T d : method.formals) {
+				codegen.C.dec.Dec dec = (codegen.C.dec.Dec) d;
+				count--;
+				dec.type.accept(this);
+				this.say(dec.id);
+				if (count > 0)
+					this.say(", ");
+			}
+			this.sayln(");");
 		}
 		this.sayln("");
 
 		this.sayln("// vtables");
 		for (codegen.C.vtable.T v : p.vtables) {
 			outputVtable((codegen.C.vtable.Vtable) v);
+		}
+		this.sayln("");
+
+		this.sayln("// methods");
+		for (codegen.C.method.T m : p.methods) {
+			m.accept(this);
 		}
 		this.sayln("");
 

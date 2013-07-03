@@ -5,11 +5,9 @@ import java.io.InputStream;
 import lexer.Lexer;
 import lexer.Token;
 import lexer.Token.Kind;
-
+import parser.Parser;
 import control.CommandLine;
 import control.Control;
-
-import parser.Parser;
 
 public class Tiger {
 	public static void main(String[] args) {
@@ -47,9 +45,9 @@ public class Tiger {
 			codegen.C.PrettyPrintVisitor ppc = new codegen.C.PrettyPrintVisitor();
 			cast.accept(ppc);
 
-			//ast.Fac.sum_prog.accept(pp);
-			//ast.Fac.prog.accept(pp);
-			//ast.Fac.sum_prog.accept(pp);
+			// ast.Fac.sum_prog.accept(pp);
+			// ast.Fac.prog.accept(pp);
+			// ast.Fac.sum_prog.accept(pp);
 			System.out
 					.println("Testing the Tiger compiler on Fac.java finished.");
 			System.exit(1);
@@ -119,7 +117,8 @@ public class Tiger {
 			break;
 		case C:
 			codegen.C.TranslateVisitor transC = new codegen.C.TranslateVisitor();
-			theAst.accept(transC);	//调用TranslateVisitor.java中的visit(ast.program.Program p)方法
+			theAst.accept(transC); // 调用TranslateVisitor.java中的visit(ast.program.Program
+									// p)方法
 			codegen.C.program.T cAst = transC.program;
 			codegen.C.PrettyPrintVisitor ppc = new codegen.C.PrettyPrintVisitor();
 			cAst.accept(ppc);
@@ -135,7 +134,17 @@ public class Tiger {
 		// call gcc to compile the generated C or x86
 		// file, or call java to run the bytecode file.
 		// Your code:
-
+	    
+		/*String[] cmdArray = { "F:/cygwin/Cygwin.bat","gcc",
+				 "Factorial.java.c", "runtime/gc.c",
+				"runtime/main.c", "runtime lib.c", "-o",
+				"Fac.exe" };
+		try {
+			Runtime.getRuntime().exec(cmdArray);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+*/
 		return;
 	}
 }

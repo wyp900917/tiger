@@ -8,13 +8,13 @@ struct intArray
   int *array;
 };
 
-struct TreeVisitor
+struct BinaryTree
 {
-  struct TreeVisitor_vtable *vptr;
+  struct BinaryTree_vtable *vptr;
 };
-struct TV
+struct BT
 {
-  struct TV_vtable *vptr;
+  struct BT_vtable *vptr;
 };
 struct Tree
 {
@@ -26,26 +26,14 @@ struct Tree
   int  has_right;
   struct Tree * my_null;
 };
-struct Visitor
-{
-  struct Visitor_vtable *vptr;
-  struct Tree * l;
-  struct Tree * r;
-};
-struct MyVisitor
-{
-  struct MyVisitor_vtable *vptr;
-  struct Tree * l;
-  struct Tree * r;
-};
 // vtables structures
-struct TreeVisitor_vtable
+struct BinaryTree_vtable
 {
 };
 
-struct TV_vtable
+struct BT_vtable
 {
-  int (*Start)(struct TV *);
+  int (*Start)(struct BT *);
 };
 
 struct Tree_vtable
@@ -70,22 +58,11 @@ struct Tree_vtable
   int (*Search)(struct Tree *, int);
   int (*Print)(struct Tree *);
   int (*RecPrint)(struct Tree *, struct Tree *);
-  int (*accept)(struct Tree *, struct Visitor *);
-};
-
-struct Visitor_vtable
-{
-  int (*visit)(struct Visitor *, struct Tree *);
-};
-
-struct MyVisitor_vtable
-{
-  int (*visit)(struct MyVisitor *, struct Tree *);
 };
 
 
 // methods declarations
-int TV_Start(struct TV *this);
+int BT_Start(struct BT *this);
 int Tree_Init(struct Tree *this, int v_key);
 int Tree_SetRight(struct Tree *this, struct Tree *rn);
 int Tree_SetLeft(struct Tree *this, struct Tree *ln);
@@ -106,18 +83,15 @@ int Tree_RemoveLeft(struct Tree *this, struct Tree *p_node, struct Tree *c_node)
 int Tree_Search(struct Tree *this, int v_key);
 int Tree_Print(struct Tree *this);
 int Tree_RecPrint(struct Tree *this, struct Tree *node);
-int Tree_accept(struct Tree *this, struct Visitor *v);
-int Visitor_visit(struct Visitor *this, struct Tree *n);
-int MyVisitor_visit(struct MyVisitor *this, struct Tree *n);
 
 // vtables
-struct TreeVisitor_vtable TreeVisitor_vtable_ = 
+struct BinaryTree_vtable BinaryTree_vtable_ = 
 {
 };
 
-struct TV_vtable TV_vtable_ = 
+struct BT_vtable BT_vtable_ = 
 {
-  TV_Start
+  BT_Start
 };
 
 struct Tree_vtable Tree_vtable_ = 
@@ -141,34 +115,23 @@ struct Tree_vtable Tree_vtable_ =
   Tree_RemoveLeft,
   Tree_Search,
   Tree_Print,
-  Tree_RecPrint,
-  Tree_accept
-};
-
-struct Visitor_vtable Visitor_vtable_ = 
-{
-  Visitor_visit
-};
-
-struct MyVisitor_vtable MyVisitor_vtable_ = 
-{
-  MyVisitor_visit
+  Tree_RecPrint
 };
 
 
 // methods
-int TV_Start(struct TV *this)
+int BT_Start(struct BT *this)
 {
   struct Tree * root;
   int  ntb;
   int  nti;
-  struct MyVisitor * v;
 
   root = ((struct Tree*)(Tiger_new (&Tree_vtable_, sizeof(struct Tree))));
   ntb = root->vptr->Init(root, 16);
   ntb = root->vptr->Print(root);
   System_out_println (100000000);
   ntb = root->vptr->Insert(root, 8);
+  ntb = root->vptr->Print(root);
   ntb = root->vptr->Insert(root, 24);
   ntb = root->vptr->Insert(root, 4);
   ntb = root->vptr->Insert(root, 12);
@@ -176,11 +139,6 @@ int TV_Start(struct TV *this)
   ntb = root->vptr->Insert(root, 28);
   ntb = root->vptr->Insert(root, 14);
   ntb = root->vptr->Print(root);
-  System_out_println (100000000);
-  v = ((struct MyVisitor*)(Tiger_new (&MyVisitor_vtable_, sizeof(struct MyVisitor))));
-  System_out_println (50000000);
-  nti = root->vptr->accept(root, v);
-  System_out_println (100000000);
   System_out_println (root->vptr->Search(root, 24));
   System_out_println (root->vptr->Search(root, 12));
   System_out_println (root->vptr->Search(root, 16));
@@ -262,9 +220,9 @@ int Tree_Insert(struct Tree *this, int v_key)
 {
   struct Tree * new_node;
   int  ntb;
-  struct Tree * current_node;
   int  cont;
   int  key_aux;
+  struct Tree * current_node;
 
   new_node = ((struct Tree*)(Tiger_new (&Tree_vtable_, sizeof(struct Tree))));
   ntb = new_node->vptr->Init(new_node, v_key);
@@ -304,9 +262,9 @@ int Tree_Delete(struct Tree *this, int v_key)
   struct Tree * parent_node;
   int  cont;
   int  found;
-  int  ntb;
   int  is_root;
   int  key_aux;
+  int  ntb;
 
   current_node = this;
   parent_node = this;
@@ -408,9 +366,9 @@ int Tree_RemoveLeft(struct Tree *this, struct Tree *p_node, struct Tree *c_node)
 }
 int Tree_Search(struct Tree *this, int v_key)
 {
-  struct Tree * current_node;
-  int  ifound;
   int  cont;
+  int  ifound;
+  struct Tree * current_node;
   int  key_aux;
 
   current_node = this;
@@ -439,8 +397,8 @@ int Tree_Search(struct Tree *this, int v_key)
 }
 int Tree_Print(struct Tree *this)
 {
-  int  ntb;
   struct Tree * current_node;
+  int  ntb;
 
   current_node = this;
   ntb = this->vptr->RecPrint(this, current_node);
@@ -465,61 +423,12 @@ int Tree_RecPrint(struct Tree *this, struct Tree *node)
     ntb = 1;
   return 1;
 }
-int Tree_accept(struct Tree *this, struct Visitor *v)
-{
-  int  nti;
-
-  System_out_println (333);
-  nti = v->vptr->visit(v, this);
-  return 0;
-}
-int Visitor_visit(struct Visitor *this, struct Tree *n)
-{
-  int  nti;
-
-  if (n->vptr->GetHas_Right(n))
-  {
-    this->r = n->vptr->GetRight(n);
-    nti = this->r->vptr->accept(this->r, this);
-  }
-  else
-    nti = 0;
-  if (n->vptr->GetHas_Left(n))
-  {
-    this->l = n->vptr->GetLeft(n);
-    nti = this->l->vptr->accept(this->l, this);
-  }
-  else
-    nti = 0;
-  return 0;
-}
-int MyVisitor_visit(struct MyVisitor *this, struct Tree *n)
-{
-  int  nti;
-
-  if (n->vptr->GetHas_Right(n))
-  {
-    this->r = n->vptr->GetRight(n);
-    nti = this->r->vptr->accept(this->r, this);
-  }
-  else
-    nti = 0;
-  System_out_println (n->vptr->GetKey(n));
-  if (n->vptr->GetHas_Left(n))
-  {
-    this->l = n->vptr->GetLeft(n);
-    nti = this->l->vptr->accept(this->l, this);
-  }
-  else
-    nti = 0;
-  return 0;
-}
 
 // main method
 int Tiger_main ()
 {
-  struct TV *temp_1;
-  System_out_println ((temp_1=((struct TV*)(Tiger_new (&TV_vtable_, sizeof(struct TV)))), temp_1->vptr->Start(temp_1)));
+  struct BT *temp_1;
+  System_out_println ((temp_1=((struct BT*)(Tiger_new (&BT_vtable_, sizeof(struct BT)))), temp_1->vptr->Start(temp_1)));
 }
 
 

@@ -6,7 +6,7 @@ import util.Temp;
 // Given a Java ast, translate it into a C ast and outputs it.
 
 public class TranslateVisitor implements ast.Visitor {
-	private ClassTable table;
+	public ClassTable table;
 	private String classId;
 	private codegen.C.type.T type; // type after translation
 	private codegen.C.dec.T dec;

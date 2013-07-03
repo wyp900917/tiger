@@ -14,7 +14,7 @@ public class Class extends T
   @Override
   public String toString()
   {
-    return this.id;
+    return "struct "+this.id;
   }
 
   @Override
