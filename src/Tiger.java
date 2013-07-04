@@ -1,6 +1,9 @@
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import lexer.Lexer;
 import lexer.Token;
@@ -10,7 +13,7 @@ import control.CommandLine;
 import control.Control;
 
 public class Tiger {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		InputStream fstream;
 		Parser parser;
 
@@ -145,6 +148,24 @@ public class Tiger {
 			e.printStackTrace();
 		}
 */
+		Process p = null;
+	    BufferedReader br;
+	    StringBuffer sb;
+	    String temp ;
+	    System.out.println("Now Compiling C code using GCC...");
+		
+		String cmdstr = "gcc -o " + Control.fileName + ".out " + Control.fileName + ".c " + "runtime/runtime.c";
+		//System.out.println(cmdstr);
+	   // String cmdstr = "gcc -o " + "a.out " + "a.c " + "runtime/runtime.c";
+		p = Runtime.getRuntime().exec(cmdstr);
+		br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+		sb = new StringBuffer();
+		while( ((temp = br.readLine()) != null) ) {
+			sb.append(temp + "\n");
+		}
+		System.out.println(sb);
+
+		System.out.println("Compile ended. Output file is \"" + Control.fileName + ".out\". You can run it now.");
 		return;
 	}
 }
