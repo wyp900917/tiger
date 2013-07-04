@@ -11,7 +11,7 @@ public class Boolean extends T
   @Override
   public String toString()
   {
-    return "@boolean";
+    return "boolean";
   }
 
   @Override

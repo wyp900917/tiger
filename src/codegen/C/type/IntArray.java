@@ -11,7 +11,7 @@ public class IntArray extends T
   @Override
   public String toString()
   {
-    return "@int[]";
+    return "int[]";
   }
 
   @Override

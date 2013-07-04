@@ -1,18 +1,15 @@
 package util;
+public class Temp {
 
-public class Temp
-{
-  private int i;
-  private static int count = 0;
+	public static int num = 0;
 
-  public Temp()
-  {
-    i = count++;
-  }
+	public Temp() {
+		num++;
+	}
 
-  @Override
-  public String toString()
-  {
-    return "x_" + (Integer.toString(this.i));
-  }
+	@Override
+	public String toString() {
+		return "temp_" + num;
+	}
+
 }

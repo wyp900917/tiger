@@ -4,8 +4,8 @@ import ast.Visitor;
 
 public class Method extends T
 {
-  public ast.type.T retType;
-  public String id;
+  public ast.type.T retType;	//返回值类型
+  public String id;		//方法名
   public java.util.LinkedList<ast.dec.T> formals;
   public java.util.LinkedList<ast.dec.T> locals;
   public java.util.LinkedList<ast.stm.T> stms;

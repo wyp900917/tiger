@@ -136,7 +136,7 @@ class Tree{
 	    key_aux = current_node.GetKey();
 	    if (v_key < key_aux){
 		if (current_node.GetHas_Left())
-		    current_node = current_node.GetLeft() ;
+		    current_node = current_node.GetLeft();
 		else {
 		    cont = false ;
 		    ntb = current_node.SetHas_Left(true);
