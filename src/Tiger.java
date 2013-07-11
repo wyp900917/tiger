@@ -138,25 +138,13 @@ public class Tiger {
 		// file, or call java to run the bytecode file.
 		// Your code:
 	    
-		/*String[] cmdArray = { "F:/cygwin/Cygwin.bat","gcc",
-				 "Factorial.java.c", "runtime/gc.c",
-				"runtime/main.c", "runtime lib.c", "-o",
-				"Fac.exe" };
-		try {
-			Runtime.getRuntime().exec(cmdArray);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-*/
 		Process p = null;
 	    BufferedReader br;
 	    StringBuffer sb;
 	    String temp ;
-	    System.out.println("Now Compiling C code using GCC...");
+	    System.out.println("Compiling C code using GCC,please wait for a while......");
 		
 		String cmdstr = "gcc -o " + Control.fileName + ".out " + Control.fileName + ".c " + "runtime/runtime.c";
-		//System.out.println(cmdstr);
-	   // String cmdstr = "gcc -o " + "a.out " + "a.c " + "runtime/runtime.c";
 		p = Runtime.getRuntime().exec(cmdstr);
 		br = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 		sb = new StringBuffer();
@@ -165,7 +153,7 @@ public class Tiger {
 		}
 		System.out.println(sb);
 
-		System.out.println("Compile ended. Output file is \"" + Control.fileName + ".out\". You can run it now.");
+		System.out.println("Compile ended. Output file is \"" + Control.fileName + ".out\". You can execute it now.");
 		return;
 	}
 }

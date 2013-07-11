@@ -81,6 +81,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 			}
 		}
 	}
+
 	// /////////////////////////////////////////////////////
 	// expressions
 	@Override
@@ -400,7 +401,6 @@ public class ElaboratorVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.type.Int t) {
-		// System.out.println("aaaa");
 		this.type = new ast.type.Int();
 		return;
 	}
@@ -446,8 +446,9 @@ public class ElaboratorVisitor implements ast.Visitor {
 				warning(var, m.formals);
 			}
 		}
-		System.out
-				.println("------------------------------------------------------------------------\n");
+		if (control.Control.elabMethodTable)
+			System.out
+					.println("------------------------------------------------------------------------\n");
 		return;
 	}
 
@@ -480,6 +481,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 	private void buildMainClass(ast.mainClass.MainClass main) {
 		this.classTable.put(main.id, new ClassBinding(null));
 	}
+
 	// class table for normal classes
 	private void buildClass(ast.classs.Class c) {
 		this.classTable.put(c.id, new ClassBinding(c.extendss));

@@ -71,7 +71,7 @@ public class PrettyPrintVisitor implements Visitor {
 	@Override
 	public void visit(codegen.C.exp.ArraySelect e) {
 		e.array.accept(this);
-		this.say("->array[");
+		this.say("[");
 		e.index.accept(this);
 		this.say("]");
 		return;
@@ -154,10 +154,9 @@ public class PrettyPrintVisitor implements Visitor {
 
 	@Override
 	public void visit(codegen.C.exp.Length e) {
-		this.say("(");
+		this.say("*((int *)(&");
 		e.array.accept(this);
-		this.say(")");
-		this.say("->length");
+		this.say(")+1)");
 		return;
 	}
 
@@ -171,7 +170,9 @@ public class PrettyPrintVisitor implements Visitor {
 
 	@Override
 	public void visit(codegen.C.exp.NewIntArray e) {
-		this.say(" no action for the NewIntArray expression!");
+		this.say("(int *)(Tiger_array_new(");
+		e.exp.accept(this);
+		this.say("))");
 		return;
 	}
 
@@ -225,24 +226,8 @@ public class PrettyPrintVisitor implements Visitor {
 		// object
 		(new codegen.C.exp.Id(s.id)).accept(this);
 		this.say(" = ");
-		if (s.exp instanceof codegen.C.exp.NewIntArray) {
-			codegen.C.exp.NewIntArray e = (codegen.C.exp.NewIntArray) s.exp;
-			this.sayln("(struct intArray *)malloc(sizeof(struct intArray));");
-			this.printSpaces();
-			(new codegen.C.exp.Id(s.id)).accept(this);
-			this.say("->length = ");
-			e.exp.accept(this);
-			this.sayln(";");
-			this.printSpaces();
-			(new codegen.C.exp.Id(s.id)).accept(this);
-			this.say("->array = ");
-			this.say("(int *)malloc((");
-			e.exp.accept(this);
-			this.sayln(")*sizeof(int));");
-		} else {
-			s.exp.accept(this);
-			this.sayln(";");
-		}
+		s.exp.accept(this);
+		this.sayln(";");
 		return;
 	}
 
@@ -250,7 +235,7 @@ public class PrettyPrintVisitor implements Visitor {
 	public void visit(codegen.C.stm.AssignArray s) {
 		this.printSpaces();
 		(new codegen.C.exp.Id(s.id)).accept(this);
-		this.say("->array[");
+		this.say("[");
 		s.index.accept(this);
 		this.say("] = ");
 		s.exp.accept(this);
@@ -325,16 +310,20 @@ public class PrettyPrintVisitor implements Visitor {
 	@Override
 	public void visit(codegen.C.type.Class t) {
 		this.say("struct " + t.id + " *");
+		return;
 	}
 
 	@Override
 	public void visit(codegen.C.type.Int t) {
 		this.say("int ");
+		return;
 	}
 
 	@Override
 	public void visit(codegen.C.type.IntArray t) {
-		this.say("struct intArray *");
+		// this.say("struct intArray *");
+		this.say("int *");
+		return;
 	}
 
 	// dec
@@ -360,6 +349,7 @@ public class PrettyPrintVisitor implements Visitor {
 		}
 		m.retType.accept(this);
 		this.say(m.classId + "_" + m.id + "(");
+		this.say("void *prev, ");
 		int count = m.formals.size();
 		for (codegen.C.dec.T d : m.formals) {
 			codegen.C.dec.Dec dec = (codegen.C.dec.Dec) d;
@@ -369,8 +359,19 @@ public class PrettyPrintVisitor implements Visitor {
 			if (count > 0)
 				this.say(", ");
 		}
+
 		this.sayln(")");
 		this.sayln("{");
+
+		this.sayln("  struct " + m.id + "_gc_frame " + m.id + "_gc_frame_temp"
+				+ ";\n");
+		this.sayln("  " + m.id + "_gc_frame_temp.prev = prev;");
+		this.sayln("  " + m.id + "_gc_frame_temp." + m.id + "_arg_gc_map = "
+				+ m.id + "_arguments_gc_map;");
+		this.sayln("  " + m.id + "_gc_frame_temp." + m.id
+				+ "_arg_base_address = (int *)&this;");
+		this.sayln("  " + m.id + "_gc_frame_temp." + m.id + "_local_gc_map = "
+				+ m.id + "_locals_gc_map;\n");
 
 		for (codegen.C.dec.T d : m.locals) {
 			codegen.C.dec.Dec dec = (codegen.C.dec.Dec) d;
@@ -411,26 +412,26 @@ public class PrettyPrintVisitor implements Visitor {
 		for (codegen.C.Ftuple t : v.ms) {
 			this.say("  ");
 			t.ret.accept(this);
-			this.say("(*" + t.id + ")(");
-			this.say("struct " + v.id + " *");
-			for (codegen.C.dec.T d : t.args) {
-				codegen.C.dec.Dec dd = (codegen.C.dec.Dec) d;
-				this.say(", ");
-				this.say(dd.type.toString());
-				if (dd.type instanceof codegen.C.type.Class) {
-					this.say(" *");
-				}
-			}
-			this.sayln(");");
+			this.sayln(" (*" + t.id + ")();");
 		}
 		this.sayln("};\n");
 		return;
+		/*
+		 * this.sayln("struct " + v.id + "_vtable"); this.sayln("{"); for
+		 * (codegen.C.Ftuple t : v.ms) { this.say("  "); t.ret.accept(this);
+		 * this.say("(*" + t.id + ")("); this.say("struct " + v.id + " *"); for
+		 * (codegen.C.dec.T d : t.args) { codegen.C.dec.Dec dd =
+		 * (codegen.C.dec.Dec) d; this.say(", "); this.say(dd.type.toString());
+		 * if (dd.type instanceof codegen.C.type.Class) { this.say(" *"); } }
+		 * this.sayln(");"); } this.sayln("};\n"); return;
+		 */
 	}
 
 	private void outputVtable(codegen.C.vtable.Vtable v) {
 		this.sayln("struct " + v.id + "_vtable " + v.id + "_vtable_ = ");
 		this.sayln("{");
 		int count = v.ms.size();
+		this.sayln("  char *"+v.id+"_gc_map;");
 		for (codegen.C.Ftuple t : v.ms) {
 			this.say("  ");
 			this.say(t.classs + "_" + t.id);
@@ -454,7 +455,7 @@ public class PrettyPrintVisitor implements Visitor {
 			this.say(" ");
 			this.sayln(t.id + ";");
 		}
-		this.sayln("};");
+		this.sayln("};\n");
 		return;
 	}
 
@@ -483,28 +484,51 @@ public class PrettyPrintVisitor implements Visitor {
 		this.sayln("// This is automatically generated by the Tiger compiler.");
 		this.sayln("// Do NOT modify!\n");
 
-		this.sayln("// structures");
-		this.sayln("struct intArray");
-		this.sayln("{");
-		this.sayln("  int length;");
-		this.sayln("  int *array;");
-		this.sayln("};");
-		this.sayln("");
+		this.sayln("//------------------------structures------------------------");
 		for (codegen.C.classs.T c : p.classes) {
 			c.accept(this);
 		}
 
-		this.sayln("// vtables structures");
+		this.sayln("//-----------------------vtables structures-------------------------");
 		for (codegen.C.vtable.T v : p.vtables) {
 			v.accept(this);
 		}
 		this.sayln("");
 
-		this.sayln("// methods declarations");
+		this.sayln("//---------------------memory GC maps----------------------");
+		for (codegen.C.method.T m : p.methods) {
+			String reference = "";
+			codegen.C.method.Method method = (codegen.C.method.Method) m;
+			this.say("char *" + method.id + "_arguments_gc_map = ");
+			for (codegen.C.dec.T d : method.formals) {
+				codegen.C.dec.Dec dec = (codegen.C.dec.Dec) d;
+				if (dec.type.toString().split(" ")[0].equals("struct")
+						|| dec.type.toString().equals("int[]"))
+					reference = reference.concat("1");
+				else
+					reference = reference.concat("0");
+			}
+			this.sayln("\"" + reference + "\";");
+			reference = "";
+			this.say("char *" + method.id + "_locals_gc_map = ");
+			for (codegen.C.dec.T d : method.locals) {
+				codegen.C.dec.Dec dec = (codegen.C.dec.Dec) d;
+				if (dec.type.toString().split(" ")[0].equals("struct")
+						|| dec.type.toString().equals("int[]"))
+					reference = reference.concat("1");
+				else
+					reference = reference.concat("0");
+			}
+			this.sayln("\"" + reference + "\";\n");
+		}
+		this.sayln("");
+
+		this.sayln("//-----------------------methods declarations--------------------------");
 		for (codegen.C.method.T m : p.methods) {
 			codegen.C.method.Method method = (codegen.C.method.Method) m;
 			method.retType.accept(this);
 			this.say(method.classId + "_" + method.id + "(");
+			this.say("void *prev, ");
 			int count = method.formals.size();
 			for (codegen.C.dec.T d : method.formals) {
 				codegen.C.dec.Dec dec = (codegen.C.dec.Dec) d;
@@ -518,19 +542,36 @@ public class PrettyPrintVisitor implements Visitor {
 		}
 		this.sayln("");
 
-		this.sayln("// vtables");
+		this.sayln("//----------------------vtables--------------------------");
 		for (codegen.C.vtable.T v : p.vtables) {
 			outputVtable((codegen.C.vtable.Vtable) v);
 		}
 		this.sayln("");
 
-		this.sayln("// methods");
+		this.sayln("//------------------------methods' GC frame---------------------------");
+		for (codegen.C.method.T m : p.methods) {
+			codegen.C.method.Method method = (codegen.C.method.Method) m;
+			this.sayln("struct " + method.id + "_gc_frame");
+			this.sayln("{");
+			this.sayln("  void *prev;");
+			this.sayln("  char *" + method.id + "_arg_gc_map;");
+			this.sayln("  int *" + method.id + "_arg_base_address;");
+			this.sayln("  char *" + method.id + "_local_gc_map;");
+			for (codegen.C.dec.T d : method.locals) {
+				codegen.C.dec.Dec dec = (codegen.C.dec.Dec) d;
+				dec.accept(this);
+			}
+			this.sayln("};\n");
+		}
+		this.sayln("");
+
+		this.sayln("//--------------------------methods---------------------------");
 		for (codegen.C.method.T m : p.methods) {
 			m.accept(this);
 		}
 		this.sayln("");
 
-		this.sayln("// main method");
+		this.sayln("//-----------------------main method-----------------------");
 		p.mainMethod.accept(this);
 		this.sayln("");
 

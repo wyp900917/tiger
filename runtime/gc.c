@@ -1,6 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+struct intArray {
+    int *array;
+    int length;
+};
 
 // "new" a new object, do necessary initializations, and
 // return the pointer (reference).
@@ -15,4 +19,11 @@ void *Tiger_new (void *vtable, int size)
   memcpy(temp, &vtable, sizeof(void *));
   // #4: return the pointer 
   return temp;
+}
+
+int *Tiger_array_new(int size) {
+    struct intArray *as = (struct intArray*)malloc(sizeof(struct intArray));
+    as->array = (int *)malloc(sizeof(int) * size);
+    as->length = size;
+    return as->array;
 }

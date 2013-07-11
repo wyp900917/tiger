@@ -108,7 +108,7 @@ public class ClassTable {
 			if (cb.extendss == null) // there is no more super class
 				return false;
 			cb = this.table.get(cb.extendss); // go on
-			if(cb == null)
+			if (cb == null)
 				return false;
 		}
 		return true;

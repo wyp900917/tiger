@@ -79,7 +79,7 @@ public class TranslateVisitor implements ast.Visitor {
 		codegen.C.exp.T exp = this.exp;
 		String newid;
 		if (this.exp instanceof codegen.C.exp.NewObject
-				|| this.exp instanceof codegen.C.exp.Call) {
+				|| this.exp instanceof codegen.C.exp.NewIntArray) {
 			newid = this.genId();
 			this.tmpVars.add(new codegen.C.dec.Dec(new codegen.C.type.Class(
 					e.type), newid));
